@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\TimeRecordController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::apiResource('employees', EmployeeController::class);
         Route::prefix('reports')->group(function () {
+            Route::get('/time-records', [ReportController::class, 'timeRecordsReport']);
+            Route::get('/summary', [ReportController::class, 'summary']);
+            Route::get('/export', [ReportController::class, 'export']);
         });
     });
 
