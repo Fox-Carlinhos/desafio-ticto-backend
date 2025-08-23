@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Address;
+use App\Models\Employee;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Address>
@@ -29,6 +30,7 @@ class AddressFactory extends Factory
         $neighborhood = $this->faker->randomElement($selectedCity['neighborhoods']);
 
         return [
+            'employee_id' => Employee::factory(),
             'cep' => $this->generateValidCep($selectedCity['state']),
             'street' => $this->faker->streetName(),
             'number' => $this->faker->buildingNumber(),

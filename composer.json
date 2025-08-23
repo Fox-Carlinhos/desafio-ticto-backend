@@ -68,6 +68,22 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "test-unit": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Unit"
+        ],
+        "test-feature": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Feature"
+        ],
+        "test-coverage": [
+            "@php artisan config:clear --ansi",
+            "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html coverage"
+        ],
+        "test-parallel": [
+            "@php artisan config:clear --ansi",
+            "./vendor/bin/paratest --processes=4"
         ]
     },
     "extra": {

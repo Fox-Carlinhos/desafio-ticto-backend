@@ -31,7 +31,7 @@ class UpdateEmployeeRequest extends FormRequest
                 'sometimes',
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($this->getEmployeeUserId($employeeId))
+                Rule::unique('users', 'email')->ignore($this->getEmployeeUserId($this->route('employee')))
             ],
             'password' => 'sometimes|string|min:6',
 
@@ -90,18 +90,31 @@ class UpdateEmployeeRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'cpf' => isset($this->cpf) ? preg_replace('/[^0-9]/', '', $this->cpf) : null,
-            'cep' => isset($this->cep) ? preg_replace('/[^0-9]/', '', $this->cep) : null,
-        ]);
+        $mergeData = [];
+
+        if ($this->has('cpf')) {
+            $mergeData['cpf'] = preg_replace('/[^0-9]/', '', $this->cpf ?? '');
+        }
+
+        if ($this->has('cep')) {
+            $mergeData['cep'] = preg_replace('/[^0-9]/', '', $this->cep ?? '');
+        }
+
+        if (!empty($mergeData)) {
+            $this->merge($mergeData);
+        }
     }
 
     /**
      * Get the user ID for the employee being updated.
      */
-    private function getEmployeeUserId($employeeId): ?int
+    private function getEmployeeUserId($employee): ?int
     {
-        $employee = Employee::find($employeeId);
-        return $employee ? $employee->user_id : null;
+        if ($employee instanceof Employee) {
+            return $employee->user_id;
+        }
+
+        $employeeModel = Employee::find($employee);
+        return $employeeModel ? $employeeModel->user_id : null;
     }
 }

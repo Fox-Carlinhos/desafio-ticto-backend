@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -78,6 +79,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'is_active' => $user->is_active,
                 ]
             ]
         ]);
@@ -88,7 +90,11 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $currentToken = $request->user()->currentAccessToken();
+
+        if ($currentToken) {
+            $currentToken->delete();
+        }
 
         return response()->json([
             'success' => true,
@@ -109,6 +115,9 @@ class AuthController extends Controller
             'email' => $user->email,
             'role' => $user->role,
             'is_active' => $user->is_active,
+            'email_verified_at' => $user->email_verified_at,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
         ];
 
         if ($user->isEmployee() && $user->employee) {
@@ -119,6 +128,12 @@ class AuthController extends Controller
                 'position' => $user->employee->position,
                 'age' => $user->employee->age,
             ];
+        } elseif ($user->isEmployee() && !$user->employee) {
+            $userData['employee'] = null;
+        }
+
+        if ($user->isAdmin()) {
+            $userData['managed_employees_count'] = Employee::where('manager_id', $user->id)->count();
         }
 
         return response()->json([

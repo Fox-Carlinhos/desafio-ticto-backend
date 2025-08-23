@@ -19,6 +19,7 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(),
             'full_name' => $this->faker->name(),
             'cpf' => $this->generateValidCpf(),
             'position' => $this->faker->randomElement([

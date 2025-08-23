@@ -158,7 +158,7 @@ class ReportController extends Controller
             INNER JOIN users u ON e.user_id = u.id
             WHERE tr.recorded_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
             AND u.is_active = 1
-            GROUP BY DATE_FORMAT(tr.recorded_at, '%Y-%m')
+            GROUP BY DATE_FORMAT(tr.recorded_at, '%Y-%m'), DATE_FORMAT(tr.recorded_at, '%m/%Y')
             ORDER BY mes DESC
         ";
 

@@ -11,7 +11,7 @@ class Address extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are mass assignable
      *
      * @var list<string>
      */
@@ -27,7 +27,7 @@ class Address extends Model
     ];
 
     /**
-     * Get the employee that owns the address.
+     * Get the employee that owns the address
      */
     public function employee(): BelongsTo
     {
@@ -35,7 +35,15 @@ class Address extends Model
     }
 
     /**
-     * Get formatted CEP.
+     * Set the CEP attribute
+     */
+    public function setCepAttribute($value): void
+    {
+        $this->attributes['cep'] = preg_replace('/[^0-9]/', '', $value ?? '');
+    }
+
+    /**
+     * Get formatted CEP
      */
     public function getFormattedCepAttribute(): string
     {
@@ -44,7 +52,7 @@ class Address extends Model
     }
 
     /**
-     * Get complete address as single string.
+     * Get complete address as single string
      */
     public function getFullAddressAttribute(): string
     {
@@ -66,7 +74,7 @@ class Address extends Model
     }
 
     /**
-     * Scope a query to filter by CEP.
+     * Scope a query to filter by CEP
      */
     public function scopeByCep($query, $cep)
     {
@@ -75,7 +83,7 @@ class Address extends Model
     }
 
     /**
-     * Scope a query to filter by city.
+     * Scope a query to filter by city
      */
     public function scopeByCity($query, $city)
     {
@@ -83,7 +91,7 @@ class Address extends Model
     }
 
     /**
-     * Scope a query to filter by state.
+     * Scope a query to filter by state
      */
     public function scopeByState($query, $state)
     {

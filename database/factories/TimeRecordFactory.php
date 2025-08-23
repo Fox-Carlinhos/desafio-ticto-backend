@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\TimeRecord;
+use App\Models\Employee;
 use Carbon\Carbon;
 
 /**
@@ -19,6 +20,7 @@ class TimeRecordFactory extends Factory
     public function definition(): array
     {
         return [
+            'employee_id' => Employee::factory(),
             'recorded_at' => $this->faker->dateTimeBetween('-3 months', 'now'),
         ];
     }
