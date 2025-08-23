@@ -1,0 +1,85 @@
+services:
+    mysql:
+        image: mysql:8.0
+        platform: linux/amd64
+        container_name: ${APP_NAME:-desafio-ticto-backend}_mysql
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+            MYSQL_DATABASE: ${DB_DATABASE:-desafio-ticto-backend}
+            MYSQL_USER: ${DB_USERNAME:-desafio-ticto-backend}
+            MYSQL_PASSWORD: ${DB_PASSWORD:-desafio-ticto-backend}
+        ports:
+            - "${DB_PORT:-3306}:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./docker/mysql/init:/docker-entrypoint-initdb.d
+        networks:
+            - app_network
+        command: --default-authentication-plugin=mysql_native_password
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        platform: linux/amd64
+        container_name: ${APP_NAME:-desafio-ticto-backend}_phpmyadmin
+        restart: unless-stopped
+        environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+            PMA_USER: root
+            PMA_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+        ports:
+            - "${PMA_PORT:-8080}:80"
+        depends_on:
+            - mysql
+        networks:
+            - app_network
+
+    laravel:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        platform: linux/amd64
+        container_name: ${APP_NAME:-desafio-ticto-backend}_laravel
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - .:/var/www/html
+        ports:
+            - "${APP_PORT:-8000}:8000"
+        depends_on:
+            - mysql
+        networks:
+            - app_network
+        environment:
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_DATABASE: ${DB_DATABASE:-desafio-ticto-backend}
+            DB_USERNAME: ${DB_USERNAME:-desafio-ticto-backend}
+            DB_PASSWORD: ${DB_PASSWORD:-desafio-ticto-backend}
+        command: >
+            sh -c "if [ ! -f vendor/autoload.php ] || ! composer check-platform-reqs --no-dev --quiet; then
+                        echo 'Installing/updating dependencies...' &&
+                        composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader;
+                    fi &&
+                    if [ ! -f .env ]; then
+                        echo 'Creating .env file...' &&
+                        cp .env.example .env;
+                    fi &&
+                    if [ -z \"$APP_KEY\" ] || [ \"$APP_KEY\" = \"\" ]; then
+                        echo 'Generating application key...' &&
+                        php artisan key:generate --no-interaction;
+                    fi &&
+                    echo 'Running migrations...' &&
+                    php artisan migrate --force &&
+                    echo 'Starting Laravel server...' &&
+                    php artisan serve --host=0.0.0.0 --port=8000"
+
+volumes:
+    mysql_data:
+        driver: local
+
+networks:
+    app_network:
+        driver: bridge
