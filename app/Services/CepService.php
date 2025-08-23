@@ -52,11 +52,23 @@ class CepService
             try {
                 $address = $this->fetchFromProvider($provider, $url, $cep);
                 if ($address) {
-                    Log::info("CEP {$cep} encontrado via {$provider}");
+                    Log::info('CEP API call successful', [
+                        'cep' => $cep,
+                        'provider' => $provider,
+                        'city' => $address['city'] ?? 'unknown',
+                        'state' => $address['state'] ?? 'unknown',
+                        'timestamp' => now()->toISOString(),
+                    ]);
                     return $address;
                 }
             } catch (RequestException $e) {
-                Log::warning("Erro ao buscar CEP {$cep} via {$provider}: " . $e->getMessage());
+                Log::warning('CEP API call failed', [
+                    'cep' => $cep,
+                    'provider' => $provider,
+                    'error' => $e->getMessage(),
+                    'status_code' => $e->getCode(),
+                    'timestamp' => now()->toISOString(),
+                ]);
                 continue;
             }
         }

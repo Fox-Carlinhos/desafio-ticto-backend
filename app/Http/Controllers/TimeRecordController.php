@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use App\Models\TimeRecord;
 use App\Models\Employee;
 use Carbon\Carbon;
@@ -11,7 +12,7 @@ use Carbon\Carbon;
 class TimeRecordController extends Controller
 {
     /**
-     * Record time punch for authenticated employee.
+     * Record time punch for authenticated employee
      */
     public function store(Request $request): JsonResponse
     {
@@ -28,6 +29,18 @@ class TimeRecordController extends Controller
             $timeRecord = TimeRecord::create([
                 'employee_id' => $user->employee->id,
                 'recorded_at' => now(),
+            ]);
+
+            Log::info('Time record created', [
+                'time_record_id' => $timeRecord->id,
+                'employee_id' => $user->employee->id,
+                'employee_name' => $user->employee->full_name,
+                'employee_position' => $user->employee->position,
+                'manager_id' => $user->employee->manager_id,
+                'recorded_at' => $timeRecord->recorded_at->toISOString(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'timestamp' => now()->toISOString(),
             ]);
 
             return response()->json([
@@ -52,7 +65,7 @@ class TimeRecordController extends Controller
     }
 
     /**
-     * Get time records for authenticated employee.
+     * Get time records for authenticated employee
      */
     public function index(Request $request): JsonResponse
     {
@@ -102,7 +115,7 @@ class TimeRecordController extends Controller
     }
 
     /**
-     * Get time records summary for authenticated employee.
+     * Get time records summary for authenticated employee
      */
     public function summary(Request $request): JsonResponse
     {
@@ -172,7 +185,7 @@ class TimeRecordController extends Controller
     }
 
     /**
-     * Get today's status for quick check.
+     * Get today's status for quick check
      */
     public function todayStatus(Request $request): JsonResponse
     {

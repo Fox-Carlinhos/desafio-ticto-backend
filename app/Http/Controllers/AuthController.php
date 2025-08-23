@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -32,12 +33,20 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (!Auth::attempt($credentials)) {
+            Log::warning('Failed authentication attempt', [
+                'email' => $request->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'timestamp' => now()->toISOString(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Email ou senha inválidos'
             ], 401);
         }
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if (!$user->is_active) {
@@ -48,6 +57,15 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        Log::info('Successful authentication', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'role' => $user->role,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'timestamp' => now()->toISOString(),
+        ]);
 
         return response()->json([
             'success' => true,

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\Address;
@@ -108,6 +109,16 @@ class EmployeeController extends Controller
             ]);
 
             DB::commit();
+
+            Log::info('Employee created by admin', [
+                'admin_id' => $request->user()->id,
+                'admin_email' => $request->user()->email,
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->full_name,
+                'employee_email' => $user->email,
+                'employee_cpf' => $employee->cpf,
+                'timestamp' => now()->toISOString(),
+            ]);
 
             $employee->load(['user', 'address', 'manager']);
 
@@ -213,7 +224,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Remove the specified employee.
+     * Remove the specified employee
      */
     public function destroy(Employee $employee): JsonResponse
     {
