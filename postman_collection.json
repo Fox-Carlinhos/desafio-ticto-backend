@@ -1,0 +1,571 @@
+{
+    "info": {
+        "name": "Ticto Time Tracking API",
+        "description": "API completa para sistema de controle de ponto da Ticto\n\n**Instruções de uso:**\n1. Configure a variável baseUrl para http://localhost:8000/api\n2. Execute primeiro o endpoint de Login\n3. O token será automaticamente salvo e usado em todas as outras requisições\n4. Endpoints protegidos requerem autenticação\n5. Endpoints de administração requerem perfil de admin\n6. Endpoints de funcionário requerem perfil de employee\n\n**Credenciais de teste:**\n- Admin: admin@ticto.com.br / admin123\n- Funcionário: carlos.santos@ticto.com.br / carlos123",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "exec": [
+                    "// Script para verificar se há token salvo",
+                    "if (!pm.collectionVariables.get(\"token\") && !pm.request.url.getPath().includes('/login')) {",
+                    "    console.log('⚠️ Token não encontrado. Execute o endpoint de Login primeiro.');",
+                    "}"
+                ],
+                "type": "text/javascript"
+            }
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "description": "Endpoints para autenticação e gerenciamento de sessão",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Salvar token automaticamente após login bem-sucedido",
+                                    "pm.test(\"Login realizado com sucesso\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    ",
+                                    "    const responseJson = pm.response.json();",
+                                    "    pm.expect(responseJson.success).to.be.true;",
+                                    "    ",
+                                    "    if (responseJson.data && responseJson.data.access_token) {",
+                                    "        pm.collectionVariables.set(\"token\", responseJson.data.access_token);",
+                                    "        console.log(\"✅ Token salvo automaticamente!\");",
+                                    "        console.log(\"🎉 Agora você pode usar todos os outros endpoints!\");",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@ticto.com.br\",\n  \"password\": \"admin123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["login"]
+                        },
+                        "description": "Fazer login no sistema e obter token de acesso.\n\n**Credenciais disponíveis:**\n- Admin: admin@ticto.com.br / admin123\n- Funcionário: carlos.santos@ticto.com.br / carlos123\n\n**Resposta de sucesso:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Login realizado com sucesso\",\n  \"data\": {\n    \"access_token\": \"1|xxxx\",\n    \"token_type\": \"Bearer\",\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"Administrador Ticto\",\n      \"email\": \"admin@ticto.com.br\",\n      \"role\": \"admin\"\n    }\n  }\n}\n```"
+                    }
+                },
+                {
+                    "name": "Me (Usuário Atual)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/me",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["me"]
+                        },
+                        "description": "Obter informações do usuário autenticado atualmente."
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Limpar token após logout",
+                                    "pm.test(\"Logout realizado com sucesso\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "    pm.collectionVariables.set(\"token\", \"\");",
+                                    "    console.log(\"🔓 Token removido. Faça login novamente para usar outros endpoints.\");",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/logout",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["logout"]
+                        },
+                        "description": "Fazer logout e revogar o token atual."
+                    }
+                },
+                {
+                    "name": "Alterar Senha",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"current_password\": \"password\",\n  \"new_password\": \"nova_senha_123\",\n  \"new_password_confirmation\": \"nova_senha_123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/change-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["change-password"]
+                        },
+                        "description": "Alterar a senha do usuário autenticado."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Gestão de Funcionários (Admin)",
+            "description": "Endpoints para administradores gerenciarem funcionários",
+            "item": [
+                {
+                    "name": "Listar Funcionários",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/employees?search=&manager_id=&page=1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["employees"],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Buscar por nome, CPF, cargo ou email"
+                                },
+                                {
+                                    "key": "manager_id",
+                                    "value": "",
+                                    "description": "Filtrar por gestor"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Página (paginação)"
+                                }
+                            ]
+                        },
+                        "description": "Listar todos os funcionários com paginação e filtros.\n\n**Parâmetros opcionais:**\n- `search`: Buscar por nome, CPF, cargo ou email (ex: Carlos, Ana, Designer)\n- `manager_id`: Filtrar funcionários por gestor (ex: 1, 2)\n- `page`: Número da página (padrão: 1)\n\n**Dados disponíveis:**\n- Funcionários criados pelo seeder incluem Carlos Santos, Ana Oliveira, etc.\n- Gestores disponíveis: ID 1 (admin@ticto.com.br), ID 2 (joao.silva@ticto.com.br)"
+                    }
+                },
+                {
+                    "name": "Criar Funcionário",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Roberto Lima\",\n  \"email\": \"roberto.lima@ticto.com.br\",\n  \"password\": \"roberto123\",\n  \"full_name\": \"Roberto Lima Silva\",\n  \"cpf\": \"98765432100\",\n  \"position\": \"Analista de Sistemas\",\n  \"birth_date\": \"1988-11-20\",\n  \"cep\": \"13040123\",\n  \"number\": \"456\",\n  \"complement\": \"Sala 12\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/employees",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["employees"]
+                        },
+                        "description": "Cadastrar um novo funcionário no sistema.\n\n**Campos obrigatórios:**\n- `name`: Nome para login\n- `email`: Email único\n- `password`: Senha (mín. 6 caracteres)\n- `full_name`: Nome completo\n- `cpf`: CPF válido (11 dígitos)\n- `position`: Cargo\n- `birth_date`: Data de nascimento (YYYY-MM-DD)\n- `cep`: CEP válido (8 dígitos)\n\n**Campos opcionais:**\n- `number`: Número do endereço\n- `complement`: Complemento do endereço"
+                    }
+                },
+                {
+                    "name": "Visualizar Funcionário",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["employees", "1"]
+                        },
+                        "description": "Visualizar detalhes completos de um funcionário específico."
+                    }
+                },
+                {
+                    "name": "Atualizar Funcionário",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Carlos Eduardo Santos\",\n  \"email\": \"carlos.eduardo@ticto.com.br\",\n  \"full_name\": \"Carlos Eduardo Santos Silva\",\n  \"position\": \"Desenvolvedor Full Stack Pleno\",\n  \"is_active\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["employees", "1"]
+                        },
+                        "description": "Atualizar dados de um funcionário existente.\n\n**Todos os campos são opcionais (PATCH-like):**\n- Dados do usuário: `name`, `email`, `password`, `is_active`\n- Dados do funcionário: `full_name`, `cpf`, `position`, `birth_date`\n- Dados do endereço: `cep`, `number`, `complement`"
+                    }
+                },
+                {
+                    "name": "Excluir Funcionário",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["employees", "1"]
+                        },
+                        "description": "Excluir um funcionário do sistema (exclusão em cascata)."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Relatórios (Admin)",
+            "description": "Endpoints para geração de relatórios (apenas admins)",
+            "item": [
+                {
+                    "name": "Relatório de Registros de Ponto",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reports/time-records?start_date=2025-05-01&end_date=2025-08-23&employee_id=&manager_id=&per_page=20&page=1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["reports", "time-records"],
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2025-05-01",
+                                    "description": "Data inicial (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2025-08-23",
+                                    "description": "Data final (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "employee_id",
+                                    "value": "",
+                                    "description": "ID do funcionário específico"
+                                },
+                                {
+                                    "key": "manager_id",
+                                    "value": "",
+                                    "description": "ID do gestor"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "20",
+                                    "description": "Registros por página (1-100)"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número da página"
+                                }
+                            ]
+                        },
+                        "description": "Relatório detalhado de registros de ponto usando SQL puro.\n\n**Campos retornados:**\n- ID do Registro\n- Nome do Funcionário\n- Cargo\n- Idade\n- Nome do Gestor\n- Data e Hora Completa (com segundos)\n\n**Filtros disponíveis:**\n- Período (start_date/end_date)\n- Funcionário específico\n- Gestor específico\n- Paginação"
+                    }
+                },
+                {
+                    "name": "Resumo Estatístico",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reports/summary?start_date=2025-05-01&end_date=2025-08-23",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["reports", "summary"],
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2025-05-01",
+                                    "description": "Data inicial (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2025-08-23",
+                                    "description": "Data final (YYYY-MM-DD)"
+                                }
+                            ]
+                        },
+                        "description": "Resumo estatístico com métricas consolidadas do sistema."
+                    }
+                },
+                {
+                    "name": "Exportar Relatório",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/reports/export?format=csv&start_date=2025-05-01&end_date=2025-08-23",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["reports", "export"],
+                            "query": [
+                                {
+                                    "key": "format",
+                                    "value": "csv",
+                                    "description": "Formato de exportação (csv, excel)"
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2025-05-01",
+                                    "description": "Data inicial"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2025-08-23",
+                                    "description": "Data final"
+                                }
+                            ]
+                        },
+                        "description": "Exportar relatórios em diferentes formatos (CSV, Excel, etc.)."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Registro de Ponto (Funcionários)",
+            "description": "Endpoints para funcionários registrarem ponto",
+            "item": [
+                {
+                    "name": "Registrar Ponto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"type\": \"entry\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/time-records",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["time-records"]
+                        },
+                        "description": "Registrar entrada ou saída no sistema de ponto.\n\n**Tipos disponíveis:**\n- `entry`: Entrada (normalmente entre 7h-9h)\n- `exit`: Saída (normalmente entre 17h-19h)\n- `break_start`: Início do intervalo (normalmente entre 11h-13h)\n- `break_end`: Fim do intervalo (normalmente entre 13h-14h)\n\n**Validações automáticas:**\n- Não permite registros duplicados no mesmo momento\n- Valida sequência lógica dos registros\n- Controla intervalos mínimos entre registros\n\n**Nota:** Sistema já possui registros dos últimos 3 meses (maio-agosto 2025)"
+                    }
+                },
+                {
+                    "name": "Meus Registros de Ponto",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/time-records?start_date=2025-05-01&end_date=2025-08-23&page=1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["time-records"],
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2025-05-01",
+                                    "description": "Data inicial (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2025-08-23",
+                                    "description": "Data final (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Página"
+                                }
+                            ]
+                        },
+                        "description": "Listar meus próprios registros de ponto com filtros de data."
+                    }
+                },
+                {
+                    "name": "Resumo dos Meus Registros",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/time-records/summary?start_date=2025-05-01&end_date=2025-08-23",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["time-records", "summary"],
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2025-05-01",
+                                    "description": "Data inicial"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2025-08-23",
+                                    "description": "Data final"
+                                }
+                            ]
+                        },
+                        "description": "Resumo consolidado dos meus registros com horas trabalhadas, atrasos, etc."
+                    }
+                },
+                {
+                    "name": "Status do Dia Atual",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/time-records/today",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["time-records", "today"]
+                        },
+                        "description": "Verificar status atual do ponto do dia (último registro, próximo tipo permitido, etc.)."
+                    }
+                }
+            ]
+        }
+    ]
+}
