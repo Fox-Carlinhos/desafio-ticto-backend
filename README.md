@@ -86,7 +86,7 @@ A collection inclui scripts automáticos para gerenciar tokens e validação de 
 
 ![Telescope Dashboard](imagesReadme/telescope.png)
 
-## 🐳 Docker e Ambiente
+## Docker e Ambiente
 
 ### Configuração Docker
 
@@ -308,10 +308,50 @@ php artisan l5-swagger:generate
 tail -f storage/logs/laravel.log
 ```
 
+## Sugestões de Funcionalidades Futuras
+
+-   **Sistema de recuperação de senha** via email com tokens seguros
+-   **Autenticação de dois fatores (2FA)** para administradores
+-   **Histórico de login** com detecção de atividades suspeitas
+
+-   **Dashboard executivo** com KPIs de produtividade
+-   **Gráficos interativos** de horas trabalhadas por período
+-   **Comparativos** entre equipes e departamentos
+-   **Tendências sazonais** de produtividade
+-   **Relatórios de absenteísmo** e atrasos
+
+-   **Banco de horas** para controle de saldo positivo/negativo
+-   **Projetos e tarefas** com alocação de horas
+-   **Metas mensais** de horas por colaborador
+-   **Acompanhamento de horas executadas vs. planejadas**
+-   **Sistema de aprovação** de horas extras
+-   **Integração com ferramentas** de gestão de projetos
+
+-   **Gestão de férias** e folgas
+-   **Controle de benefícios** e adicionais
+-   **Avaliações de desempenho** baseadas em pontualidade
+-   **Notificações automáticas** para gestores sobre atrasos
+-   **Relatórios de compliance** para auditoria
+
+-   **Webhooks** para integração com sistemas externos
+-   **Exportação automática** para sistemas de folha de pagamento
+-   **Integração com calendários** corporativos
+-   **Sincronização com sistemas** de gestão de pessoas
+
+-   **Relatórios personalizáveis** por gestor
+-   **Exportação em múltiplos formatos** (PDF, Excel, CSV)
+-   **Assinatura digital** de relatórios
+-   **Auditoria completa** de alterações
+
+-   **Detecção automática** de padrões de trabalho
+-   **Previsão de demanda** de horas por projeto
+-   **Otimização de escalas** baseada em histórico
+-   **Machine Learning** para identificação de anomalias
+
 ## Licença
 
 Este projeto foi desenvolvido como parte do desafio técnico da Ticto. Todos os direitos reservados.
 
 ---
 
-**Desenvolvido usando Laravel e tecnologias modernas**
+**Desenvolvido com Laravel e tecnologias modernas**

@@ -65,6 +65,25 @@ class TimeRecord extends Model
     }
 
     /**
+     * Scope a query to filter by date range for admin (alias for betweenDates).
+     */
+    public function scopeFilterByDate($query, $startDate, $endDate = null)
+    {
+        if ($endDate) {
+            return $query->whereBetween('recorded_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        }
+        return $query->whereDate('recorded_at', $startDate);
+    }
+
+    /**
+     * Scope a query to filter by specific employee (alias for byEmployee).
+     */
+    public function scopeFilterByEmployee($query, $employeeId)
+    {
+        return $query->where('employee_id', $employeeId);
+    }
+
+    /**
      * Get formatted recorded time.
      */
     public function getFormattedRecordedAtAttribute(): string

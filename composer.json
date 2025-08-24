@@ -29,6 +29,7 @@
         "laravel/pint": "^1.22.1",
         "laravel/sail": "^1.43.1",
         "laravel/tinker": "^2.10.1",
+        "mockery/mockery": "^1.6",
         "orchestra/testbench-core": "^9.12.0 || ^10.4",
         "pestphp/pest": "^3.8.2",
         "sebastian/environment": "^7.2.1 || ^8.0"
