@@ -178,4 +178,60 @@ class AuthController extends Controller
             'message' => 'Senha alterada com sucesso'
         ]);
     }
+
+    /**
+     * Get user profile data
+     */
+    public function profile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $responseData = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ];
+
+        if ($user->isEmployee() && $user->employee) {
+            $employee = $user->employee;
+            $employee->load(['manager', 'address']);
+
+            $responseData['employee'] = [
+                'id' => $employee->id,
+                'full_name' => $employee->full_name,
+                'cpf' => $employee->formatted_cpf,
+                'position' => $employee->position,
+                'birth_date' => $employee->birth_date,
+                'age' => $employee->age,
+                'manager' => $employee->manager ? [
+                    'id' => $employee->manager->id,
+                    'name' => $employee->manager->name
+                ] : null,
+                'address' => $employee->address ? [
+                    'cep' => $employee->address->formatted_cep,
+                    'full_address' => $employee->address->full_address,
+                    'street' => $employee->address->street,
+                    'number' => $employee->address->number,
+                    'complement' => $employee->address->complement,
+                    'neighborhood' => $employee->address->neighborhood,
+                    'city' => $employee->address->city,
+                    'state' => $employee->address->state,
+                ] : null
+            ];
+        } elseif ($user->isAdmin()) {
+            $responseData['admin'] = [
+                'role' => 'admin',
+                'managed_employees_count' => Employee::where('manager_id', $user->id)->count(),
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $responseData
+        ]);
+    }
+
+
 }

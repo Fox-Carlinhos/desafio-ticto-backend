@@ -57,6 +57,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin1->id,
                 ],
                 'address' => [
+                    'cep' => '13010-001',
                     'city' => 'Campinas',
                     'state' => 'SP',
                 ]
@@ -74,6 +75,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin1->id,
                 ],
                 'address' => [
+                    'cep' => '13083-970',
                     'city' => 'Campinas',
                     'state' => 'SP',
                 ]
@@ -91,6 +93,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin1->id,
                 ],
                 'address' => [
+                    'cep' => '01310-100',
                     'city' => 'São Paulo',
                     'state' => 'SP',
                 ]
@@ -108,6 +111,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin2->id,
                 ],
                 'address' => [
+                    'cep' => '13025-320',
                     'city' => 'Campinas',
                     'state' => 'SP',
                 ]
@@ -125,6 +129,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin2->id,
                 ],
                 'address' => [
+                    'cep' => '13092-123',
                     'city' => 'Campinas',
                     'state' => 'SP',
                 ]
@@ -142,6 +147,7 @@ class TimeTrackingSeeder extends Seeder
                     'manager_id' => $admin2->id,
                 ],
                 'address' => [
+                    'cep' => '04038-001',
                     'city' => 'São Paulo',
                     'state' => 'SP',
                 ]
@@ -169,6 +175,7 @@ class TimeTrackingSeeder extends Seeder
                 ->city($data['address']['city'], $data['address']['state'])
                 ->create([
                     'employee_id' => $employee->id,
+                    'cep' => $data['address']['cep'],
                 ]);
 
             $this->command->info("  ✓ {$data['employee']['full_name']} - {$data['employee']['position']}");

@@ -185,6 +185,111 @@ class TimeRecordController extends Controller
     }
 
     /**
+     * Admin access to all time records
+     */
+    public function adminIndex(Request $request): JsonResponse
+    {
+        $request->validate([
+            'start_date' => 'nullable|date|date_format:Y-m-d',
+            'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:start_date',
+            'employee_id' => 'nullable|integer|exists:employees,id',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $query = TimeRecord::with(['employee.user'])
+            ->orderBy('recorded_at', 'desc');
+
+        if ($request->start_date) {
+            $query->filterByDate($request->start_date, $request->end_date ?? $request->start_date);
+        }
+
+        if ($request->employee_id) {
+            $query->filterByEmployee($request->employee_id);
+        }
+
+        $timeRecords = $query->paginate(20);
+
+        $formattedRecords = $timeRecords->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'recorded_at' => $record->formatted_recorded_at,
+                'date' => $record->recorded_at->format('d/m/Y'),
+                'time' => $record->recorded_at->format('H:i:s'),
+                'employee' => [
+                    'id' => $record->employee->id,
+                    'full_name' => $record->employee->full_name,
+                    'position' => $record->employee->position,
+                    'user' => [
+                        'name' => $record->employee->user->name,
+                        'email' => $record->employee->user->email,
+                    ]
+                ]
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $formattedRecords,
+            'pagination' => [
+                'current_page' => $timeRecords->currentPage(),
+                'last_page' => $timeRecords->lastPage(),
+                'per_page' => $timeRecords->perPage(),
+                'total' => $timeRecords->total(),
+            ]
+        ]);
+    }
+
+    /**
+     * Admin access to specific employee's time records
+     */
+    public function adminEmployeeRecords(Request $request, Employee $employee): JsonResponse
+    {
+        $request->validate([
+            'start_date' => 'nullable|date|date_format:Y-m-d',
+            'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:start_date',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $query = TimeRecord::where('employee_id', $employee->id)
+            ->orderBy('recorded_at', 'desc');
+
+        if ($request->start_date) {
+            $query->filterByDate($request->start_date, $request->end_date ?? $request->start_date);
+        }
+
+        $timeRecords = $query->paginate(20);
+
+        $formattedRecords = $timeRecords->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'recorded_at' => $record->formatted_recorded_at,
+                'date' => $record->recorded_at->format('d/m/Y'),
+                'time' => $record->recorded_at->format('H:i:s'),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'employee' => [
+                'id' => $employee->id,
+                'full_name' => $employee->full_name,
+                'position' => $employee->position,
+                'user' => [
+                    'name' => $employee->user->name,
+                    'email' => $employee->user->email,
+                ]
+            ],
+            'data' => $formattedRecords,
+            'pagination' => [
+                'current_page' => $timeRecords->currentPage(),
+                'last_page' => $timeRecords->lastPage(),
+                'per_page' => $timeRecords->perPage(),
+                'total' => $timeRecords->total(),
+            ]
+        ]);
+    }
+
+    /**
      * Get today's status for quick check
      */
     public function todayStatus(Request $request): JsonResponse
