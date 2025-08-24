@@ -1,15 +1,12 @@
 import "./bootstrap";
 
-// Alpine.js imports
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
 import focus from "@alpinejs/focus";
 
-// Configure Alpine plugins
 Alpine.plugin(persist);
 Alpine.plugin(focus);
 
-// Global Alpine data
 Alpine.data("auth", () => ({
     user: Alpine.$persist(null),
     token: Alpine.$persist(null),
@@ -75,7 +72,6 @@ Alpine.data("auth", () => ({
     },
 
     showToast(message, type = "info") {
-        // Dispatch custom event for toast notifications
         window.dispatchEvent(
             new CustomEvent("show-toast", {
                 detail: { message, type },
@@ -98,7 +94,6 @@ Alpine.data("toastManager", () => ({
         const id = Date.now();
         this.toasts.push({ id, message, type });
 
-        // Auto remove after 5 seconds
         setTimeout(() => {
             this.removeToast(id);
         }, 5000);
@@ -258,7 +253,6 @@ Alpine.data("employeeDashboard", () => ({
     async loadSummary() {
         this.loadingStats = true;
         try {
-            // Set default dates (last 30 days for summary)
             const today = new Date();
             const startDate = new Date(today);
             startDate.setDate(today.getDate() - 30);
@@ -276,14 +270,12 @@ Alpine.data("employeeDashboard", () => ({
             if (result.success) {
                 this.summaryData = result.data;
 
-                // Calculate week records from last_7_days
                 this.weekRecords =
                     this.summaryData?.last_7_days?.daily_records?.reduce(
                         (total, day) => total + day.count,
                         0
                     ) || 0;
 
-                // Calculate average per day (total records / 30 days)
                 const totalRecords =
                     this.summaryData?.this_month?.total_records || 0;
                 const daysInPeriod = 30;
@@ -297,7 +289,6 @@ Alpine.data("employeeDashboard", () => ({
     },
 
     showToast(message, type = "info") {
-        // Simple alert for now, can be enhanced later
         alert(message);
     },
 }));
@@ -381,7 +372,6 @@ window.apiRequest = async function (endpoint, method = "GET", data = null) {
         },
     };
 
-    // Add body for POST, PUT, PATCH requests
     if (data && ["POST", "PUT", "PATCH"].includes(config.method)) {
         config.body = JSON.stringify(data);
     }
@@ -389,7 +379,6 @@ window.apiRequest = async function (endpoint, method = "GET", data = null) {
     try {
         const response = await fetch(`/api${endpoint}`, config);
 
-        // Try to parse JSON, but handle cases where response might not be JSON
         let responseData;
         try {
             responseData = await response.json();
@@ -397,7 +386,6 @@ window.apiRequest = async function (endpoint, method = "GET", data = null) {
             responseData = { message: "Invalid response format" };
         }
 
-        // Handle authentication errors
         if (response.status === 401) {
             console.log(
                 "Authentication failed, clearing localStorage and redirecting"

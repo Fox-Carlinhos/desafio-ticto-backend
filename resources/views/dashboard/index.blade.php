@@ -4,7 +4,6 @@
 
 @section('content')
 <div x-data="dashboard()" x-init="init()">
-    <!-- Role-based dashboard -->
     <template x-if="isAdmin()">
         <div>
             @include('dashboard.partials.admin-dashboard')

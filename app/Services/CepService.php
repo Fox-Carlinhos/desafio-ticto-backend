@@ -96,7 +96,7 @@ class CepService
     }
 
     /**
-     * Normalize response from different providers
+     * Normalize answer from different providers
      */
     private function normalizeAddress(string $provider, array $data): ?array
     {

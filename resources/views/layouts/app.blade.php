@@ -128,7 +128,6 @@
             token: null,
 
             init() {
-                // Check if user is logged in
                 this.token = localStorage.getItem('auth_token');
                 const userData = localStorage.getItem('user_data');
 
