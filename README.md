@@ -1,61 +1,303 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Desafio Ticto - Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de controle de ponto eletrônico com gestão de funcionários, desenvolvido em Laravel com arquitetura moderna e interface responsiva.
 
-## About Laravel
+## Arquitetura do Backend
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Tecnologias Utilizadas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Laravel 11** - Framework PHP robusto e moderno
+-   **MySQL 8.0** - Banco de dados relacional
+-   **Laravel Sanctum** - Autenticação API com tokens
+-   **Alpine.js** - Reatividade frontend sem complexidade
+-   **Tailwind CSS** - Framework CSS utilitário
+-   **Docker** - Containerização e ambiente de desenvolvimento
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Estrutura da API
 
-## Learning Laravel
+-   **RESTful API** com 20 endpoints organizados
+-   **Middleware de autenticação** para admin e funcionários
+-   **Validação robusta** com Form Requests customizados
+-   **Relacionamentos Eloquent** otimizados
+-   **Paginação automática** com scroll infinito
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+![Backend Architecture](imagesReadme/docker.png)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Frontend e Arquitetura
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Interface Responsiva
 
-## Laravel Sponsors
+-   **Design System** consistente com Tailwind CSS
+-   **Componentes reutilizáveis** em Blade templates
+-   **Alpine.js** para interatividade sem SPA
+-   **Layouts adaptativos** para diferentes dispositivos
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Funcionalidades Principais
 
-### Premium Partners
+-   **Dashboard administrativo** com métricas em tempo real
+-   **Gestão de funcionários** com CRUD completo
+-   **Sistema de ponto eletrônico** intuitivo
+-   **Relatórios avançados** com filtros dinâmicos
+-   **Perfil de usuário** adaptativo por tipo
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+![Admin Dashboard](imagesReadme/admin-dashboard.png)
 
-## Contributing
+## Documentação da API
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Collection Postman
 
-## Code of Conduct
+-   **20 endpoints** documentados e testados
+-   **Autenticação automática** com tokens
+-   **Scripts de teste** para validação
+-   **Exemplos de uso** para cada endpoint
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Endpoints Principais
 
-## Security Vulnerabilities
+-   **Authentication** (6): Login, logout, perfil, alteração de senha
+-   **Employees** (5): CRUD completo de funcionários
+-   **Time Records** (6): Sistema de ponto e relatórios
+-   **Reports** (3): Relatórios administrativos
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+![Postman Collection](imagesReadme/postman_collection_updated.json)
 
-## License
+## Observabilidade
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Laravel Telescope
+
+-   **Debugging avançado** em desenvolvimento
+-   **Monitoramento de queries** SQL
+-   **Logs de requisições** e respostas
+-   **Inspeção de cache** e sessões
+-   **Rastreamento de jobs** e eventos
+
+![Telescope Dashboard](imagesReadme/telescope.png)
+
+## 🐳 Docker e Ambiente
+
+### Configuração Docker
+
+```bash
+# Clonar o repositório
+git clone <repository-url>
+cd desafio-ticto-backend
+
+# Iniciar containers
+docker-compose up -d
+
+# Acessar container Laravel
+docker-compose exec laravel bash
+```
+
+### Docker Compose
+
+-   **MySQL 8.0** - Banco de dados principal com **InnoDB obrigatório**
+-   **Laravel** - Aplicação PHP com Nginx
+-   **Volumes persistentes** para dados
+-   **Networks isoladas** para segurança
+-   **Configurações otimizadas** para InnoDB e português brasileiro
+
+![Docker Setup](imagesReadme/docker.png)
+
+## Populando o Banco de Dados
+
+### Comandos no Container Laravel
+
+```bash
+# Acessar container
+docker-compose exec laravel bash
+
+# Instalar dependências
+composer install
+
+# Configurar ambiente
+cp .env.example .env
+php artisan key:generate
+
+# Executar migrações
+php artisan migrate
+
+# Popular banco com dados de teste
+php artisan db:seed
+
+# Criar usuários específicos
+php artisan db:seed --class=AdminSeeder
+php artisan db:seed --class=TimeTrackingSeeder
+```
+
+### Build do Frontend
+
+````bash
+# Acessar container
+docker-compose exec laravel bash
+
+# Instalar dependências Node.js
+npm install
+
+# Build para desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+
+
+### Seeders Disponíveis
+
+-   **AdminSeeder** - Usuário administrador padrão
+-   **TimeTrackingSeeder** - Dados de funcionários e registros
+-   **DatabaseSeeder** - Ordem de execução dos seeders
+
+## Como Executar
+
+### Pré-requisitos
+
+-   Docker e Docker Compose instalados
+-   Git para clonar o repositório
+-   Porta 8000 disponível para a aplicação
+
+### Passos de Instalação
+
+1. **Clone o repositório**
+2. **Inicie os containers** com `docker-compose up -d`
+3. **Configure o banco** executando os comandos de seed
+4. **Acesse a aplicação** em `http://localhost:8000`
+
+## Login e Uso
+
+### Credenciais de Acesso
+
+-   **Administrador**
+    -   Email: `admin@ticto.com.br`
+    -   Senha: `admin123`
+-   **Funcionário**
+    -   Email: `carlos.santos@ticto.com.br`
+    -   Senha: `carlos123`
+
+### Funcionalidades por Tipo de Usuário
+
+#### Administrador
+
+-   **Dashboard completo** com métricas
+-   **Gestão de funcionários** (CRUD)
+-   **Visualização de registros** de todos os funcionários
+-   **Relatórios avançados** com exportação
+-   **Acesso ao perfil** pessoal
+
+![Admin Dashboard](imagesReadme/admin-dashboard.png)
+
+#### Funcionário
+
+-   **Dashboard simplificado** com informações pessoais
+-   **Registro de ponto** eletrônico
+-   **Histórico de registros** pessoal
+-   **Perfil completo** com dados pessoais
+-   **Resumo de horas** trabalhadas
+
+![Employee Dashboard](imagesReadme/emplyee-dashboard.png)
+
+## Funcionalidades Principais
+
+### Gestão de Funcionários
+
+-   Cadastro completo com validação de CPF
+-   Integração com API de CEP para endereços
+-   Sistema de gestão hierárquica
+-   Controle de status ativo/inativo
+
+![Employees Management](imagesReadme/employees.png)
+
+### Sistema de Ponto
+
+-   Registro de entrada e saída
+-   Histórico detalhado por período
+-   Resumo de horas trabalhadas
+-   Status do dia atual
+
+![Time Records](imagesReadme/employee-time-records.png)
+
+### Relatórios Administrativos
+
+-   Relatórios de ponto por funcionário
+-   Resumo geral da empresa
+-   Exportação de dados
+-   Filtros por período e gestor
+
+![Reports](imagesReadme/reports.png)
+
+## Testes
+
+### Executando Testes
+
+```bash
+# Acessar container
+docker-compose exec laravel bash
+
+# Executar todos os testes
+php artisan test
+
+# Executar testes específicos
+php artisan test --filter=EmployeeTest
+php artisan test --filter=AuthTest
+````
+
+### Cobertura de Testes
+
+-   **Testes unitários** para modelos e serviços
+-   **Testes de feature** para endpoints da API
+-   **Testes de middleware** para autenticação
+-   **Validação de regras** de negócio
+
+![Test Results](imagesReadme/test-unit.png)
+
+## Perfil de Usuário
+
+### Funcionalidades do Perfil
+
+-   **Dados pessoais** atualizáveis
+-   **Informações profissionais** específicas por tipo
+-   **Endereço completo** com validação de CEP
+-   **Histórico de atividades** recentes
+
+![User Profile](imagesReadme/profile.png)
+
+## Desenvolvimento
+
+### Estrutura do Projeto
+
+```
+desafio-ticto-backend/
+├── app/
+│   ├── Http/Controllers/     # Controllers da API e Web
+│   ├── Models/               # Modelos Eloquent
+│   ├── Services/             # Serviços de negócio
+│   └── Http/Requests/        # Validação de dados
+├── database/
+│   ├── migrations/           # Estrutura do banco
+│   ├── seeders/              # Dados de teste
+│   └── factories/            # Fábricas para testes
+├── resources/views/          # Templates Blade
+├── routes/                   # Definição de rotas
+└── tests/                    # Suite de testes
+```
+
+### Comandos Úteis
+
+```bash
+# Limpar cache
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+
+# Gerar documentação da API
+php artisan l5-swagger:generate
+
+# Monitorar logs em tempo real
+tail -f storage/logs/laravel.log
+```
+
+## Licença
+
+Este projeto foi desenvolvido como parte do desafio técnico da Ticto. Todos os direitos reservados.
+
+---
+
+**Desenvolvido usando Laravel e tecnologias modernas**

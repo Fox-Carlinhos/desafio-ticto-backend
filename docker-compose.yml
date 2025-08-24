@@ -13,10 +13,11 @@ services:
             - "${DB_PORT:-3306}:3306"
         volumes:
             - mysql_data:/var/lib/mysql
-            - ./docker/mysql/init:/docker-entrypoint-initdb.d
         networks:
             - app_network
-        command: --default-authentication-plugin=mysql_native_password
+        command: >
+            --default-authentication-plugin=mysql_native_password
+            --default-storage-engine=InnoDB
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin:latest

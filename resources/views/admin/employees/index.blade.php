@@ -66,7 +66,7 @@
                                     <div class="text-sm text-secondary-900" x-text="employee.position || 'N/A'"></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-secondary-900" x-text="employee.manager?.full_name || 'Sem gestor'"></div>
+                                    <div class="text-sm text-secondary-900" x-text="employee.manager?.name || 'Sem gestor'"></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span :class="employee.user?.is_active ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800' : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'">
@@ -91,6 +91,32 @@
                         </template>
                     </tbody>
                 </table>
+
+                <!-- Loading More Indicator -->
+                <div x-show="loadingMore" class="p-4 text-center border-t border-secondary-200">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
+                    <p class="mt-2 text-sm text-secondary-600">Carregando mais funcionários...</p>
+                </div>
+
+                <!-- End of List Indicator -->
+                <div x-show="!loadingMore && hasMorePages" class="p-4 text-center border-t border-secondary-200">
+                    <p class="text-sm text-secondary-500">Role para baixo para carregar mais funcionários</p>
+                </div>
+
+                <!-- No More Pages Indicator -->
+                <div x-show="!loadingMore && !hasMorePages && employees.length > 0" class="p-4 text-center border-t border-secondary-200">
+                    <p class="text-sm text-secondary-500">Todos os funcionários foram carregados</p>
+                </div>
+
+                <!-- Load More Button (fallback) -->
+                <div x-show="!loadingMore && hasMorePages && employees.length > 0" class="p-4 text-center border-t border-secondary-200">
+                    <button @click="loadMoreEmployees()" class="btn-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        Carregar Mais Funcionários
+                    </button>
+                </div>
             </div>
 
             <!-- Empty State -->
@@ -118,7 +144,10 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('employeeManager', () => ({
         employees: [],
         loading: true,
+        loadingMore: false,
         deletingEmployee: false,
+        currentPage: 1,
+        hasMorePages: true,
         filters: {
             search: '',
             status: '',
@@ -129,10 +158,18 @@ document.addEventListener('alpine:init', () => {
             setTimeout(async () => {
                 await this.loadEmployees();
             }, 100);
+
+            window.addEventListener('scroll', () => this.handleScroll());
         },
 
-        async loadEmployees() {
-            this.loading = true;
+        async loadEmployees(reset = true) {
+            if (reset) {
+                this.loading = true;
+                this.currentPage = 1;
+                this.hasMorePages = true;
+            } else {
+                this.loadingMore = true;
+            }
 
             try {
                 if (typeof window.apiRequest !== 'function') {
@@ -140,7 +177,7 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 const params = new URLSearchParams();
-                params.append('page', '1');
+                params.append('page', this.currentPage.toString());
 
                 if (this.filters.search) params.append('search', this.filters.search);
                 if (this.filters.status) params.append('is_active', this.filters.status);
@@ -151,20 +188,35 @@ document.addEventListener('alpine:init', () => {
                 const result = await window.apiRequest(url, 'GET');
 
                 if (result && result.success && result.data) {
-                    this.employees = result.data;
+                    if (reset) {
+                        this.employees = result.data;
+                    } else {
+                        this.employees = [...this.employees, ...result.data];
+                    }
+
+                    if (result.pagination) {
+                        this.hasMorePages = result.pagination.current_page < result.pagination.last_page;
+                        this.currentPage = result.pagination.current_page;
+                    }
+
                 } else {
                     console.error('Invalid API response format:', result);
-                    this.employees = [];
+                    if (reset) {
+                        this.employees = [];
+                    }
                 }
             } catch (error) {
                 console.error('Error loading employees:', error);
-                this.employees = [];
+                if (reset) {
+                    this.employees = [];
+                }
 
                 if (!error.message.includes('401') && !error.message.includes('Unauthenticated')) {
                     alert('Erro ao carregar funcionários: ' + error.message);
                 }
             } finally {
                 this.loading = false;
+                this.loadingMore = false;
             }
         },
 
@@ -184,6 +236,11 @@ document.addEventListener('alpine:init', () => {
 
                 this.employees = this.employees.filter(emp => emp.id !== employee.id);
 
+                if (this.employees.length === 0 && this.hasMorePages) {
+                    this.currentPage = Math.max(1, this.currentPage - 1);
+                    await this.loadEmployees(false);
+                }
+
                 alert('Funcionário excluído com sucesso!');
             } catch (error) {
                 console.error('Erro ao excluir funcionário:', error);
@@ -196,6 +253,31 @@ document.addEventListener('alpine:init', () => {
         formatDate(date) {
             if (!date) return 'N/A';
             return new Date(date).toLocaleDateString('pt-BR');
+        },
+
+        async loadMoreEmployees() {
+            if (this.loadingMore || !this.hasMorePages) {
+                return;
+            }
+
+            this.currentPage++;
+            await this.loadEmployees(false);
+        },
+
+        handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            if (documentHeight - scrollTop - windowHeight < 100) {
+                this.loadMoreEmployees();
+            }
+        },
+
+        async applyFilters() {
+            this.currentPage = 1;
+            this.hasMorePages = true;
+            await this.loadEmployees(true);
         }
     }));
 });

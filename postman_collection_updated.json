@@ -1,8 +1,8 @@
 {
     "info": {
         "_postman_id": "desafio-ticto-backend-api-updated",
-        "name": "Desafio Ticto - API Completa (18 Endpoints)",
-        "description": "Collection COMPLETA com todos os 18 endpoints incluindo novos endpoints para admin acessar registros de qualquer funcionário.\n\n**📋 Endpoints incluídos:**\n- 🔐 Authentication (4): login, logout, me, change-password\n- 👨‍💼 Employees (5): index, store, show, update, destroy \n- ⏰ Time Records Employee (4): store, index, summary, today\n- 👨‍💼 Time Records Admin (2): admin-index, admin-employee-records\n- 📊 Reports (3): time-records, summary, export\n\n**🚀 Como usar:**\n1. Importe esta collection no Postman\n2. Execute login Admin/Employee \n3. Tokens são salvos automaticamente\n4. Teste todos os endpoints\n\n**🔑 Credenciais:**\n- Admin: admin@ticto.com.br / admin123\n- Employee: carlos.santos@ticto.com.br / carlos123",
+        "name": "Desafio Ticto - API Completa (20 Endpoints)",
+        "description": "Collection COMPLETA com todos os 20 endpoints incluindo novos endpoints para admin acessar registros de qualquer funcionário e perfil de usuário.\n\n**📋 Endpoints incluídos:**\n- 🔐 Authentication (5): login, logout, me, change-password, profile\n- 👨‍💼 Employees (5): index, store, show, update, destroy \n- ⏰ Time Records Employee (4): store, index, summary, today\n- 👨‍💼 Time Records Admin (2): admin-index, admin-employee-records\n- 📊 Reports (3): time-records, summary, export\n- 👤 Profile (1): get user profile (admin/employee)\n\n**🚀 Como usar:**\n1. Importe esta collection no Postman\n2. Execute login Admin/Employee \n3. Tokens são salvos automaticamente\n4. Teste todos os endpoints\n\n**🔑 Credenciais:**\n- Admin: admin@ticto.com.br / admin123\n- Employee: carlos.santos@ticto.com.br / carlos123",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -45,8 +45,8 @@
     },
     "item": [
         {
-            "name": "🔐 Authentication (4 endpoints)",
-            "description": "Sistema de autenticação completo com Sanctum",
+            "name": "🔐 Authentication (6 endpoints)",
+            "description": "Sistema de autenticação completo com Sanctum e perfil de usuário",
             "item": [
                 {
                     "name": "1. Login - Admin",
@@ -560,6 +560,64 @@
                         },
                         "description": "Admins podem visualizar registros de um funcionário específico com informações detalhadas do funcionário"
                     }
+                }
+            ]
+        },
+        {
+            "name": "👤 User Profile (1 endpoint)",
+            "description": "Endpoint para obter perfil do usuário autenticado (admin ou employee)",
+            "item": [
+                {
+                    "name": "1. Get User Profile (GET /profile)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    if (response.success && response.data) {",
+                                    "        console.log('👤 Profile loaded successfully');",
+                                    "        if (response.data.employee) {",
+                                    "            console.log('👨‍💼 Employee profile:', response.data.employee.full_name);",
+                                    "            console.log('📅 Birth date:', response.data.employee.birth_date);",
+                                    "            console.log('👔 Position:', response.data.employee.position);",
+                                    "            console.log('👔 Manager:', response.data.employee.manager?.name || 'Sem gestor');",
+                                    "            console.log('🏠 Address:', response.data.employee.address?.full_address || 'Sem endereço');",
+                                    "        } else if (response.data.admin) {",
+                                    "            console.log('👨‍💼 Admin profile:', response.data.admin.role);",
+                                    "            console.log('👥 Managed employees:', response.data.admin.managed_employees_count);",
+                                    "        }",
+                                    "        pm.test('Profile data structure is correct', function () {",
+                                    "            pm.expect(response.data).to.have.property('user');",
+                                    "            pm.expect(response.data.user).to.have.property('name');",
+                                    "            pm.expect(response.data.user).to.have.property('email');",
+                                    "        });",
+                                    "    }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{auth_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/profile",
+                            "host": ["{{base_url}}"],
+                            "path": ["profile"]
+                        }
+                    },
+                    "description": "Endpoint para obter perfil do usuário autenticado (admin ou employee). Retorna dados específicos baseados no tipo de usuário:\n\n**Para Employees:**\n- Dados pessoais (nome, CPF, cargo, data de nascimento, idade)\n- Informações do gestor\n- Endereço completo\n\n**Para Admins:**\n- Função administrativa\n- Contagem de funcionários gerenciados\n\n**Acesso:** Ambos os tipos de usuário podem acessar"
                 }
             ]
         },
