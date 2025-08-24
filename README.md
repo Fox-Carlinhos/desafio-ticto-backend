@@ -58,7 +58,21 @@ Sistema de controle de ponto eletrônico com gestão de funcionários, desenvolv
 -   **Time Records** (6): Sistema de ponto e relatórios
 -   **Reports** (3): Relatórios administrativos
 
-![Postman Collection](imagesReadme/postman_collection_updated.json)
+### Como Usar a Documentação
+
+A documentação completa da API está disponível via **Postman**:
+
+1. **Importe a Collection**: `postman_collection_updated.json`
+2. **Configure o Environment**: Use as variáveis de ambiente fornecidas
+3. **Execute o Login**: Para obter tokens de autenticação automaticamente
+4. **Teste os Endpoints**: Todos os 20 endpoints estão documentados e testados
+
+**Arquivos necessários:**
+
+-   Collection: `postman_collection_updated.json`
+-   Environment: `postman_environment.json`
+
+A collection inclui scripts automáticos para gerenciar tokens e validação de respostas.
 
 ## Observabilidade
 
